@@ -382,3 +382,18 @@ function loadSettingsToUI() {
 function toggleBgInput() { const val = document.querySelector('input[name="bg-mode"]:checked').value; document.getElementById('img-input-area').classList.toggle('hidden', val !== 'image'); }
 function saveSystemSettings() { let cfg = getConfig(); cfg.bgMode = document.querySelector('input[name="bg-mode"]:checked').value; cfg.bgUrl = document.getElementById('bg-url').value.trim(); saveConfig(cfg); applySystemSettings(); alert("Đã lưu cài đặt chung!"); }
 function saveNotification() { let cfg = getConfig(); cfg.notification = document.getElementById('notif-text').value; saveConfig(cfg); alert("Đã lưu thông báo!"); }
+
+// --- RESET BẰNG F5 ---
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F5') {
+        e.preventDefault(); // Ngăn refresh trang
+        if (!document.getElementById('quiz-view').classList.contains('hidden')) {
+            // Nếu đang thi, reset bài thi về đầu
+            const originalQs = quiz.qs.slice(0, quiz.originalTotal);
+            startQuiz(quiz.sub, quiz.part, originalQs);
+        } else {
+            // Nếu không, logout (reset toàn bộ)
+            logout();
+        }
+    }
+});
