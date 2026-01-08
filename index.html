@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Thi Trực Tuyến Pro</title>
+    <title>Hệ Thống Thi Trực Tuyến V8 Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <audio id="bg-music" loop></audio>
+    <audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2020/2020-preview.mp3"></audio>
 
     <div id="notification-modal" class="modal-overlay hidden">
         <div class="notification-box fade-up">
@@ -24,7 +28,7 @@
         <div class="login-card fade-up">
             <div class="logo-area"><i class="fas fa-graduation-cap"></i></div>
             <h1>E-Test System</h1>
-            <p class="subtitle">Cổng thi trực tuyến nội bộ</p>
+            <p class="subtitle">Khoa lọ chéo bách</p>
             <div class="input-group">
                 <i class="fas fa-user"></i>
                 <input type="text" id="user-input" class="login-input" placeholder="Tên đăng nhập">
@@ -35,10 +39,6 @@
             </div>
             <p id="login-msg"></p>
             <button class="btn btn-primary btn-block" onclick="handleLogin()">ĐĂNG NHẬP</button>
-            <div class="login-footer">
-                <span class="tag admin-tag">Khoa lọ</span>
-                <span class="tag user-tag">Black gay</span>
-            </div>
         </div>
     </div>
 
@@ -59,7 +59,7 @@
         </aside>
         <main class="main-content">
             <header class="top-bar">
-                <div class="welcome-text"><h3>Xin chào, <span id="admin-name-display">Admin</span></h3><p>Quản trị hệ thống</p></div>
+                <div class="welcome-text"><h3>Xin chào, <span id="admin-name-display">Admin</span></h3></div>
                 <div class="user-profile"><img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Avatar"></div>
             </header>
             
@@ -72,12 +72,12 @@
 
             <div id="tab-users" class="admin-tab hidden fade-in">
                 <div class="card-panel">
-                    <div class="card-header"><h3>👥 Danh sách tài khoản</h3></div>
+                    <div class="card-header"><h3>👥 Quản lý người dùng</h3></div>
                     <div class="add-user-form">
-                        <input type="text" id="new-fullname" class="modern-input" placeholder="Tên hiển thị (VD: Nguyễn Văn A)">
-                        <input type="text" id="new-username" class="modern-input" placeholder="Username (VD: user1)">
+                        <input type="text" id="new-fullname" class="modern-input" placeholder="Tên hiển thị">
+                        <input type="text" id="new-username" class="modern-input" placeholder="Username">
                         <input type="text" id="new-password" class="modern-input" placeholder="Mật khẩu">
-                        <button class="btn btn-primary" onclick="addUser()"><i class="fas fa-plus"></i> Tạo</button>
+                        <button class="btn btn-primary" onclick="addUser()">Tạo</button>
                     </div>
                     <div class="table-responsive mt-20"><table class="modern-table"><thead><tr><th>Tên Hiển Thị</th><th>Username</th><th>Pass</th><th>Hành động</th></tr></thead><tbody id="user-manage-body"></tbody></table></div>
                 </div>
@@ -86,19 +86,25 @@
             <div id="tab-settings" class="admin-tab hidden fade-in">
                 <div class="grid-2-col">
                     <div class="card-panel">
-                        <h3>🎨 Giao diện đăng nhập</h3>
-                        <div class="setting-group-vertical">
-                            <label class="radio-row"><input type="radio" name="bg-mode" value="default" checked onclick="toggleBgInput()"><div class="radio-label"><i class="fas fa-paint-brush"></i> Mặc định</div></label>
-                            <label class="radio-row"><input type="radio" name="bg-mode" value="rgb" onclick="toggleBgInput()"><div class="radio-label"><i class="fas fa-magic"></i> RGB Nháy chậm</div></label>
-                            <label class="radio-row"><input type="radio" name="bg-mode" value="image" onclick="toggleBgInput()"><div class="radio-label"><i class="fas fa-image"></i> Ảnh tùy chọn</div></label>
-                        </div>
-                        <div id="img-input-area" class="hidden fade-in mt-20"><input type="text" id="bg-url" class="modern-input w-100" placeholder="Link ảnh..."></div>
-                        <button class="btn btn-primary w-100 mt-20" onclick="saveSystemSettings()">Lưu Cài Đặt</button>
+                        <h3>🎵 Cài đặt Nhạc nền</h3>
+                        <p class="text-muted">Chọn nguồn nhạc cho toàn hệ thống.</p>
+                        <select id="music-mode" class="modern-input w-100" onchange="toggleMusicInput()">
+                            <option value="default">Nhạc Lofi hệ thống</option>
+                            <option value="custom">Nhạc tùy chỉnh (Link MP3)</option>
+                        </select>
+                        <input type="text" id="custom-music-url" class="modern-input w-100 hidden mt-20" placeholder="Dán link nhạc .mp3 vào đây...">
+                        <button class="btn btn-primary w-100 mt-20" onclick="saveMusicConfig()">Lưu cấu hình nhạc</button>
                     </div>
                     <div class="card-panel">
-                        <h3>📢 Thông báo</h3>
-                        <textarea id="notif-text" class="modern-textarea" placeholder="Nội dung thông báo..."></textarea>
-                        <button class="btn btn-secondary w-100 mt-20" onclick="saveNotification()">Cập nhật</button>
+                        <h3>🎨 Nền & Thông báo</h3>
+                        <div class="setting-group-vertical">
+                            <label class="radio-row"><input type="radio" name="bg-mode" value="default" checked onclick="toggleBgInput()"><div class="radio-label">Mặc định</div></label>
+                            <label class="radio-row"><input type="radio" name="bg-mode" value="rgb" onclick="toggleBgInput()"><div class="radio-label">RGB Nháy chậm</div></label>
+                            <label class="radio-row"><input type="radio" name="bg-mode" value="image" onclick="toggleBgInput()"><div class="radio-label">Ảnh tùy chọn</div></label>
+                        </div>
+                        <div id="img-input-area" class="hidden fade-in mt-20"><input type="text" id="bg-url" class="modern-input w-100" placeholder="Link ảnh..."></div>
+                        <textarea id="notif-text" class="modern-textarea mt-20" placeholder="Nội dung thông báo..."></textarea>
+                        <button class="btn btn-primary w-100 mt-20" onclick="saveSystemSettings()">Lưu cài đặt chung</button>
                     </div>
                 </div>
             </div>
@@ -107,22 +113,40 @@
 
     <div id="student-app" class="app-container hidden">
         <aside class="sidebar">
-            <div class="brand"><div class="brand-icon"><i class="fas fa-user-graduate"></i></div><span>Student</span></div>
+            <div class="brand"><div class="brand-icon"><i class="fas fa-user-graduate"></i></div><span>Học Viên</span></div>
             <nav class="menu"><div class="menu-item active"><i class="fas fa-book-open"></i> Bài thi của tôi</div></nav>
             <div class="sidebar-footer"><div class="menu-item logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</div></div>
         </aside>
         <main class="main-content">
             <header class="top-bar">
-                <div class="welcome-text"><h3>Xin chào, <span id="student-name-display">...</span></h3><p>Chọn chương để bắt đầu học.</p></div>
-                <div class="user-profile"><img src="" alt="Avatar" id="student-avatar"></div>
+                <div class="welcome-text"><h3>Chào, <span id="student-name-display">...</span></h3></div>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <button id="music-toggle" class="btn-music" onclick="toggleMusic()">
+                        <i class="fas fa-volume-mute"></i> Nhạc: Tắt
+                    </button>
+                    <div class="user-profile"><img src="" alt="Avatar" id="student-avatar"></div>
+                </div>
             </header>
             
             <div id="subject-view">
-                <div id="subject-grid"></div> </div>
+                <div id="subject-grid"></div> 
+            </div>
 
             <div id="quiz-view" class="hidden fade-in">
-                <button class="btn btn-outline mb-20" onclick="renderSubjects()">⬅ Quay lại</button>
-                <div class="quiz-container"><div id="quiz-content"></div></div>
+                <div class="progress-container fade-up">
+                    <div class="progress-info">
+                        <span>Câu: <span id="cur-q" style="color:var(--primary)">0</span>/<span id="total-q">0</span></span>
+                        <span id="prog-pc" style="font-weight:bold; color:var(--secondary)">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div id="quiz-content"></div>
+                </div>
+                <button class="btn btn-outline mt-20" onclick="renderSubjects()">Thoát bài thi</button>
             </div>
         </main>
     </div>
