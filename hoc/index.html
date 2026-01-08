@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Thi Trực Tuyến Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="notification-modal" class="modal-overlay hidden">
+        <div class="notification-box fade-up">
+            <div class="modal-icon"><i class="fas fa-bell"></i></div>
+            <h2>Thông Báo</h2>
+            <div id="notification-content"></div>
+            <button class="btn btn-primary" onclick="closeNotification()">Đã hiểu</button>
+        </div>
+    </div>
+
+    <div id="login-screen">
+        <div id="login-bg"></div>
+        <div class="login-card fade-up">
+            <div class="logo-area"><i class="fas fa-graduation-cap"></i></div>
+            <h1>E-Test System</h1>
+            <p class="subtitle">Cổng thi trực tuyến nội bộ</p>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="user-input" class="login-input" placeholder="Tên đăng nhập">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="pass-input" class="login-input" placeholder="Mật khẩu" onkeypress="handleEnter(event)">
+            </div>
+            <p id="login-msg"></p>
+            <button class="btn btn-primary btn-block" onclick="handleLogin()">ĐĂNG NHẬP</button>
+            <div class="login-footer">
+                <span class="tag admin-tag">Admin: xuananh2006</span>
+                <span class="tag user-tag">Pass: admin123</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-app" class="app-container hidden">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-shield-alt"></i></div>
+                <span>Admin Panel</span>
+            </div>
+            <nav class="menu">
+                <div class="menu-item active" onclick="switchAdminTab('tab-stats', this)"><i class="fas fa-chart-pie"></i> Thống kê</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-users', this)"><i class="fas fa-users-cog"></i> Quản lý User</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-settings', this)"><i class="fas fa-sliders-h"></i> Cài đặt</div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="menu-item logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</div>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-text"><h3>Xin chào, <span id="admin-name-display">Admin</span></h3><p>Quản trị hệ thống</p></div>
+                <div class="user-profile"><img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Avatar"></div>
+            </header>
+            
+            <div id="tab-stats" class="admin-tab fade-in">
+                <div class="card-panel">
+                    <div class="card-header"><h3>📊 Kết quả học tập</h3></div>
+                    <div class="table-responsive"><table class="modern-table"><thead><tr><th>Tên Hiển Thị</th><th>Username</th><th>Số bài</th><th>Điểm TB</th><th>Mới nhất</th><th>Chi tiết</th></tr></thead><tbody id="stats-body"></tbody></table></div>
+                </div>
+            </div>
+
+            <div id="tab-users" class="admin-tab hidden fade-in">
+                <div class="card-panel">
+                    <div class="card-header"><h3>👥 Danh sách tài khoản</h3></div>
+                    <div class="add-user-form">
+                        <input type="text" id="new-fullname" class="modern-input" placeholder="Tên hiển thị (VD: Nguyễn Văn A)">
+                        <input type="text" id="new-username" class="modern-input" placeholder="Username (VD: user1)">
+                        <input type="text" id="new-password" class="modern-input" placeholder="Mật khẩu">
+                        <button class="btn btn-primary" onclick="addUser()"><i class="fas fa-plus"></i> Tạo</button>
+                    </div>
+                    <div class="table-responsive mt-20"><table class="modern-table"><thead><tr><th>Tên Hiển Thị</th><th>Username</th><th>Pass</th><th>Hành động</th></tr></thead><tbody id="user-manage-body"></tbody></table></div>
+                </div>
+            </div>
+
+            <div id="tab-settings" class="admin-tab hidden fade-in">
+                <div class="grid-2-col">
+                    <div class="card-panel">
+                        <h3>🎨 Giao diện đăng nhập</h3>
+                        <div class="setting-group-vertical">
+                            <label class="radio-row"><input type="radio" name="bg-mode" value="default" checked onclick="toggleBgInput()"><div class="radio-label"><i class="fas fa-paint-brush"></i> Mặc định</div></label>
+                            <label class="radio-row"><input type="radio" name="bg-mode" value="rgb" onclick="toggleBgInput()"><div class="radio-label"><i class="fas fa-magic"></i> RGB Nháy chậm</div></label>
+                            <label class="radio-row"><input type="radio" name="bg-mode" value="image" onclick="toggleBgInput()"><div class="radio-label"><i class="fas fa-image"></i> Ảnh tùy chọn</div></label>
+                        </div>
+                        <div id="img-input-area" class="hidden fade-in mt-20"><input type="text" id="bg-url" class="modern-input w-100" placeholder="Link ảnh..."></div>
+                        <button class="btn btn-primary w-100 mt-20" onclick="saveSystemSettings()">Lưu Cài Đặt</button>
+                    </div>
+                    <div class="card-panel">
+                        <h3>📢 Thông báo</h3>
+                        <textarea id="notif-text" class="modern-textarea" placeholder="Nội dung thông báo..."></textarea>
+                        <button class="btn btn-secondary w-100 mt-20" onclick="saveNotification()">Cập nhật</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="student-app" class="app-container hidden">
+        <aside class="sidebar">
+            <div class="brand"><div class="brand-icon"><i class="fas fa-user-graduate"></i></div><span>Student</span></div>
+            <nav class="menu"><div class="menu-item active"><i class="fas fa-book-open"></i> Bài thi của tôi</div></nav>
+            <div class="sidebar-footer"><div class="menu-item logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</div></div>
+        </aside>
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="welcome-text"><h3>Xin chào, <span id="student-name-display">...</span></h3><p>Chọn chương để bắt đầu học.</p></div>
+                <div class="user-profile"><img src="" alt="Avatar" id="student-avatar"></div>
+            </header>
+            
+            <div id="subject-view">
+                <div id="subject-grid"></div> </div>
+
+            <div id="quiz-view" class="hidden fade-in">
+                <button class="btn btn-outline mb-20" onclick="renderSubjects()">⬅ Quay lại</button>
+                <div class="quiz-container"><div id="quiz-content"></div></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="edit-pass-modal" class="modal-overlay hidden">
+        <div class="notification-box fade-up" style="width:400px">
+            <h3>Đổi mật khẩu</h3><p id="edit-user-target" class="text-muted"></p>
+            <input type="text" id="new-pass-input" class="modern-input w-100" placeholder="Pass mới...">
+            <div class="modal-actions"><button class="btn btn-secondary" onclick="closeEditPass()">Hủy</button><button class="btn btn-primary" onclick="confirmChangePass()">Lưu</button></div>
+        </div>
+    </div>
+
+    <script src="data-python.js"></script>
+    <script src="data-phapluat.js"></script>
+    <script src="data-web.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
